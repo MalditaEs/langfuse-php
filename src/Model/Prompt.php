@@ -10,11 +10,11 @@ class Prompt
 {
     private string $id;
     private string $name;
-    private string $prompt;
+    private $prompt;
     private ?array $config;
     private int $version;
     private ?string $type;
-    private ?string $labels;
+    private ?array $labels;
     private string $createdAt;
     private string $updatedAt;
     private string $createdBy;
@@ -54,7 +54,7 @@ class Prompt
         return $this->name;
     }
 
-    public function getPrompt(): string
+    public function getPrompt()
     {
         return $this->prompt;
     }
@@ -74,7 +74,7 @@ class Prompt
         return $this->type;
     }
 
-    public function getLabels(): ?string
+    public function getLabels(): ?array
     {
         return $this->labels;
     }
@@ -99,17 +99,39 @@ class Prompt
         return $this->projectId;
     }
 
-    public function compile(?array $variables = null): string
+    public function compile(?array $variables = null)
     {
         if ($variables === null || empty($variables)) {
             return $this->prompt;
         }
 
-        $compiled = $this->prompt;
-        foreach ($variables as $key => $value) {
-            $compiled = str_replace('{{' . $key . '}}', (string) $value, $compiled);
+        // Handle string prompt
+        if (is_string($this->prompt)) {
+            $compiled = $this->prompt;
+            foreach ($variables as $key => $value) {
+                $compiled = str_replace('{{' . $key . '}}', (string) $value, $compiled);
+            }
+            return $compiled;
         }
 
-        return $compiled;
+        // Handle array prompt (chat format)
+        if (is_array($this->prompt)) {
+            $compiled = [];
+            foreach ($this->prompt as $message) {
+                if (isset($message['role']) && isset($message['content'])) {
+                    $content = $message['content'];
+                    foreach ($variables as $key => $value) {
+                        $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+                    }
+                    $compiled[] = [
+                        'role' => $message['role'],
+                        'content' => $content
+                    ];
+                }
+            }
+            return $compiled;
+        }
+
+        return $this->prompt;
     }
 }
