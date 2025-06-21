@@ -1,5 +1,5 @@
 {
-  "name": "janzaba/langfuse",
+  "name": "malditaes/langfuse-php",
   "description": "A PHP library for interacting with the Langfuse API",
   "type": "library",
   "require": {
@@ -22,6 +22,10 @@
     {
       "name": "Jan Żaba",
       "email": "janekzaba@gmail.com"
+    },
+    {
+      "name": "David Fernández",
+      "email": "dfernandez@maldita.es"
     }
   ],
   "minimum-stability": "stable",
