@@ -99,7 +99,7 @@ class LangfuseClient
         }
         
         try {
-            $response = $this->httpClient->get('/api/public/v2/prompts/' . urlencode($promptName), [
+            $response = $this->httpClient->get('/api/public/v2/prompts/' . $promptName, [
                 'query' => $queryParams,
             ]);
             
