@@ -88,6 +88,47 @@ $answer = $this->langfuseManager->withGeneration(
 );
 ```
 
+#### Prompt Management
+
+You can retrieve prompts from Langfuse to manage your prompts centrally:
+
+```php
+// Get production prompt (default)
+$prompt = $this->langfuseManager->getPrompt("Extract claims from text");
+
+// Get by label
+$prompt = $this->langfuseManager->getPrompt("Extract claims from text", "production");
+$prompt = $this->langfuseManager->getPrompt("Extract claims from text", "latest");
+
+// Get by version (not recommended as it requires code changes to deploy new prompt versions)
+$prompt = $this->langfuseManager->getPrompt("Extract claims from text", null, 1);
+
+// Use the prompt
+$promptText = $prompt->getPrompt();
+$promptVersion = $prompt->getVersion();
+
+// Compile prompt with variables
+$compiledPrompt = $prompt->compile([
+    'topic' => 'climate change',
+    'max_words' => 100
+]);
+
+// Integrate with generation tracking
+$answer = $this->langfuseManager->withGeneration(
+    'summarize-article', 
+    'gpt-4o-mini', 
+    ['role' => 'system', 'content' => $compiledPrompt], 
+    function () use ($compiledPrompt) {
+        return $this->openAIClient->chat()->create([
+            'model' => 'gpt-4o-mini',
+            'messages' => [
+                ['role' => 'system', 'content' => $compiledPrompt]
+            ],
+        ]);
+    }
+);
+```
+
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue for any improvements or bugs.
